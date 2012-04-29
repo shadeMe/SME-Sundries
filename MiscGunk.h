@@ -39,5 +39,7 @@ namespace SME
 				BaseRef = Buffer;
 			}
 		};
+
+		const char* GetTimeString(char* Out, size_t Size, const char* FormatString = "%m--%d--%Y %H-%M-%S");
 	}
 }

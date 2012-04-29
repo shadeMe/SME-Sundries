@@ -20,9 +20,20 @@ namespace SME
 			ReferenceFrame = FrameBuffer;
 		}
 
-		long double ElapsedTimeCounter::GetTimePassed( void ) const
+		inline long double ElapsedTimeCounter::GetTimePassed( void ) const
 		{
 			return TimePassed;
+		}
+
+		const char* GetTimeString( char* Out, size_t Size, const char* FormatString /*= "%m--%d--%Y %H-%M-%S"*/ )
+		{
+			__time32_t TimeData;
+			tm LocalTime;
+
+			_time32(&TimeData);
+			_localtime32_s(&LocalTime, &TimeData);
+			strftime(Out, Size, FormatString, &LocalTime);
+			return Out;
 		}
 	}
 }

@@ -59,6 +59,7 @@ namespace SME
 		// some basic instantiations
 		typedef GetterTFunctorBase<void*>						PointerGetter;
 		typedef GetterTFunctorBase<HWND>						HWNDGetter;
+		typedef GetterTFunctorBase<HINSTANCE>					HINSTANCEGetter;
 		typedef GetterTFunctorBase<HMENU>						HMENUGetter;
 		typedef GetterTFunctorBase<LPDIRECT3DDEVICE9>			D3D9DeviceGetter;
 	}

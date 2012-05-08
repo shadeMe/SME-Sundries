@@ -60,6 +60,8 @@ namespace SME
 			INISetting(INIManager* Manager, const char* Key, const char* Section, const char* DefaultValue, const char* Description);
 			virtual ~INISetting();
 
+			virtual bool										operator<(const INISetting& Second);
+
 			const char*											GetDescription(void) const;
 			const char*											GetKey(void) const;
 			const char*											GetSection(void) const;

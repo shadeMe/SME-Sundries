@@ -1,8 +1,6 @@
 #include "SME_Prefix.h"
 #include "INIManager.h"
 
-TODO("Auto-sort settings by section and key name. Check for name collisions")
-
 namespace SME
 {
 	namespace INI
@@ -32,6 +30,7 @@ namespace SME
 			NewSetting->Load(this);
 
 			SettingList.push_back(NewSetting);
+			SettingList.sort();
 			return true;
 		}
 
@@ -165,8 +164,18 @@ namespace SME
 			Value = Buffer;
 		}
 
-		INIManagerIterator::INIManagerIterator(INIManager* Manager) : Manager(Manager)
+		bool INISetting::operator<( const INISetting& Second )
 		{
+			int Result = _stricmp(Key.c_str(), Second.Key.c_str());
+
+			return !Result;
+		}
+
+		INIManagerIterator::INIManagerIterator(INIManager* Manager) :
+			Manager(Manager)
+		{
+			SME_ASSERT(Manager);
+
 			INIListSize = Manager->SettingList.size();
 			Iterator = Bookend = Manager->SettingList.end();
 			CurrentSetting = NULL;

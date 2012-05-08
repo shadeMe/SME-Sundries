@@ -20,7 +20,7 @@ namespace SME
 			ReferenceFrame = FrameBuffer;
 		}
 
-		inline long double ElapsedTimeCounter::GetTimePassed( void ) const
+		long double ElapsedTimeCounter::GetTimePassed( void ) const
 		{
 			return TimePassed;
 		}
@@ -34,6 +34,30 @@ namespace SME
 			_localtime32_s(&LocalTime, &TimeData);
 			strftime(Out, Size, FormatString, &LocalTime);
 			return Out;
+		}
+
+		void ToggleFlag(UInt8* Flag, UInt32 Mask, bool State)
+		{
+			if (State)
+				*Flag |= Mask;
+			else
+				*Flag &= ~Mask;
+		}
+
+		void ToggleFlag(UInt16* Flag, UInt32 Mask, bool State)
+		{
+			if (State)
+				*Flag |= Mask;
+			else
+				*Flag &= ~Mask;
+		}
+
+		void ToggleFlag(UInt32* Flag, UInt32 Mask, bool State)
+		{
+			if (State)
+				*Flag |= Mask;
+			else
+				*Flag &= ~Mask;
 		}
 	}
 }

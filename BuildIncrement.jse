@@ -1,0 +1,22 @@
+var today = new Date();
+var day = today.getDate();
+var month = today.getMonth() + 1;
+
+var fso   = new ActiveXObject("Scripting.FileSystemObject");
+var buildInfo = fso.CreateTextFile("BuildInfo.h", true);
+
+if (day < 10) {
+	day = "0" + day;
+}
+
+buildInfo.WriteLine( "#define VERSION_BUILD               " + month + "" + day);
+
+if (month < 10) {
+	month= "0" + month;
+}
+
+buildInfo.WriteLine( "#define VERSION_BUILD_PAD       " + month + "" + day);
+buildInfo.Close();
+
+
+

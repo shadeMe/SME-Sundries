@@ -15,6 +15,13 @@ namespace SME
 			}
 		}
 
+		Handler_Nop::Handler_Nop( UInt32 PatchAddr, UInt32 Size ) :
+			m_Address(PatchAddr),
+			m_Size(Size)
+		{
+			;//
+		}
+
 		void Handler_Ace::WriteBuffer()
 		{
 			if (m_Buffer == 0 || m_BufferSize == 0 || m_AddressA == 0)
@@ -71,6 +78,29 @@ namespace SME
 				return;
 
 			SafeWrite8(m_AddressA, Data);
+		}
+
+		Handler_Ace::Handler_Ace( UInt32 HookAddr, UInt32 JumpAddr, UInt8* Buffer, UInt32 BufferSize ) :
+			m_AddressA(HookAddr),
+			m_AddressB(JumpAddr),
+			m_Buffer(Buffer),
+			m_BufferSize(BufferSize)
+		{
+			;//
+		}
+
+		Handler_Ace::Handler_Ace( UInt32 HookAddr, void* JumpAddr, UInt8* Buffer, UInt32 BufferSize ) :
+			m_AddressA(HookAddr),
+			m_AddressB((UInt32)JumpAddr),
+			m_Buffer(Buffer),
+			m_BufferSize(BufferSize)
+		{
+			;//
+		}
+
+		Handler_Ace::~Handler_Ace()
+		{
+			SAFEDELETE_ARRAY(m_Buffer);
 		}
 
 		void SafeWrite8(UInt32 addr, UInt32 data)

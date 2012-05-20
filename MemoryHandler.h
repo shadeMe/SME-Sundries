@@ -12,7 +12,7 @@ namespace SME
 			UInt32				m_Address;
 			UInt32				m_Size;
 		public:
-			Handler_Nop(UInt32 PatchAddr, UInt32 Size) : m_Address(PatchAddr), m_Size(Size) {}
+			Handler_Nop(UInt32 PatchAddr, UInt32 Size);
 
 			void				WriteNop();
 		};
@@ -25,8 +25,9 @@ namespace SME
 			UInt8*				m_Buffer;
 			UInt32				m_BufferSize;
 		public:
-			Handler_Ace(UInt32 HookAddr, UInt32 JumpAddr, UInt8* Buffer, UInt32 BufferSize) : m_AddressA(HookAddr), m_AddressB(JumpAddr), m_Buffer(Buffer), m_BufferSize(BufferSize) {}
-			Handler_Ace(UInt32 HookAddr, void* JumpAddr, UInt8* Buffer, UInt32 BufferSize) : m_AddressA(HookAddr), m_AddressB((UInt32)JumpAddr), m_Buffer(Buffer), m_BufferSize(BufferSize) {}
+			Handler_Ace(UInt32 HookAddr, UInt32 JumpAddr, UInt8* Buffer, UInt32 BufferSize);
+			Handler_Ace(UInt32 HookAddr, void* JumpAddr, UInt8* Buffer, UInt32 BufferSize);
+			~Handler_Ace();
 
 			void				WriteJump();
 			void				WriteCall();
@@ -47,18 +48,18 @@ namespace SME
 		void	WriteRelCall(UInt32 jumpSrc, UInt32 jumpTgt);
 		UInt8*	MakeUInt8Array(UInt32 Size, ...);
 
-		#define _DeclareMemHdlr(Name, Comment)									extern MemHdlr		k##Name; void Name##Hook(void)
-		#define _DeclareNopHdlr(Name, Comment)									extern NopHdlr		k##Name
+		#define _DeclareMemHdlr(Name, Comment)									extern MemHdlr		kMemHdlr##Name; void Name##Hook(void)
+		#define _DeclareNopHdlr(Name, Comment)									extern NopHdlr		kMemHdlr##Name
 
-		#define _DefineCallHdlr(Name, PatchAddr, Function)						MemHdlr	k##Name		(##PatchAddr, (UInt32)&##Function, 0, 0)
-		#define _DefineHookHdlr(Name, PatchAddr)								MemHdlr	k##Name		(##PatchAddr, Name##Hook, 0, 0)
-		#define _DefineHookHdlrWithBuffer(Name, PatchAddr, BufferSize, ...)		MemHdlr	k##Name		(##PatchAddr, Name##Hook, MakeUInt8Array(##BufferSize,  ##__VA_ARGS__), BufferSize)
-		#define _DefinePatchHdlr(Name, PatchAddr)								MemHdlr	k##Name		(##PatchAddr, (UInt32)0, 0, 0)
-		#define _DefinePatchHdlrWithBuffer(Name, PatchAddr, BufferSize, ...)	MemHdlr	k##Name		(##PatchAddr, (UInt32)0, MakeUInt8Array(##BufferSize,  ##__VA_ARGS__), BufferSize)
-		#define _DefineJumpHdlr(Name, PatchAddr, JumpAddr)						MemHdlr	k##Name		(##PatchAddr, JumpAddr, 0, 0)
-		#define _DefineNopHdlr(Name, PatchAddr, Size)							NopHdlr	k##Name		(##PatchAddr, Size)
+		#define _DefineCallHdlr(Name, PatchAddr, Function)						MemHdlr	kMemHdlr##Name		(##PatchAddr, (UInt32)&##Function, 0, 0)
+		#define _DefineHookHdlr(Name, PatchAddr)								MemHdlr	kMemHdlr##Name		(##PatchAddr, Name##Hook, 0, 0)
+		#define _DefineHookHdlrWithBuffer(Name, PatchAddr, BufferSize, ...)		MemHdlr	kMemHdlr##Name		(##PatchAddr, Name##Hook, MakeUInt8Array(##BufferSize,  ##__VA_ARGS__), BufferSize)
+		#define _DefinePatchHdlr(Name, PatchAddr)								MemHdlr	kMemHdlr##Name		(##PatchAddr, (UInt32)0, 0, 0)
+		#define _DefinePatchHdlrWithBuffer(Name, PatchAddr, BufferSize, ...)	MemHdlr	kMemHdlr##Name		(##PatchAddr, (UInt32)0, MakeUInt8Array(##BufferSize,  ##__VA_ARGS__), BufferSize)
+		#define _DefineJumpHdlr(Name, PatchAddr, JumpAddr)						MemHdlr	kMemHdlr##Name		(##PatchAddr, JumpAddr, 0, 0)
+		#define _DefineNopHdlr(Name, PatchAddr, Size)							NopHdlr	kMemHdlr##Name		(##PatchAddr, Size)
 
-		#define _MemHdlr(Name)													k##Name
+		#define _MemHdlr(Name)													kMemHdlr##Name
 
 		#define _hhName															HookFnName
 		#define _hhBegin()														zz__BeginHookHdlrFn(_hhName)

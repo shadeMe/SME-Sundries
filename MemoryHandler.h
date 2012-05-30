@@ -60,6 +60,7 @@ namespace SME
 		#define _DefineNopHdlr(Name, PatchAddr, Size)							NopHdlr	kMemHdlr##Name		(##PatchAddr, Size)
 
 		#define _MemHdlr(Name)													kMemHdlr##Name
+		#define _MemHdlrHook(Name)												Name##Hook
 
 		#define _hhName															HookFnName
 		#define _hhBegin()														zz__BeginHookHdlrFn(_hhName)

@@ -12,6 +12,8 @@ namespace SME
 		class INIManager
 		{
 		protected:
+			static bool											SortComparator(INISetting* First, INISetting* Second);
+
 			typedef std::list<INISetting*>						INISettingListT;
 
 			std::string											INIFilePath;

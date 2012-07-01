@@ -30,7 +30,7 @@ namespace SME
 			NewSetting->Load(this);
 
 			SettingList.push_back(NewSetting);
-			SettingList.sort();
+			SettingList.sort(SortComparator);
 			return true;
 		}
 
@@ -85,6 +85,11 @@ namespace SME
 		bool INIManager::DirectWrite( const char* Section, const char* Value )
 		{
 			return WritePrivateProfileSection(Section, Value, GetPath());
+		}
+
+		bool INIManager::SortComparator( INISetting* First, INISetting* Second )
+		{
+			return !(*First < *Second);
 		}
 
 		INISetting::INISetting(INIManager* Manager, const char* Key, const char* Section, const char* DefaultValue, const char* Description)
@@ -166,9 +171,11 @@ namespace SME
 
 		bool INISetting::operator<( const INISetting& Second )
 		{
-			int Result = _stricmp(Key.c_str(), Second.Key.c_str());
+			int Result = _stricmp(Section.c_str(), Second.Section.c_str());
+	//		if (Result == 0)
+	//			Result = _stricmp(Key.c_str(), Second.Key.c_str());
 
-			return !Result;
+			return Result >= 0;
 		}
 
 		INIManagerIterator::INIManagerIterator(INIManager* Manager) :

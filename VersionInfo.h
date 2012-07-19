@@ -43,4 +43,8 @@
 
 #define PACKED_SME_VERSION		MAKE_SME_VERSION(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD)
 
+#define SME_VERSION_MAJOR(version)		(version >> 24) & 0xFF
+#define SME_VERSION_MINOR(version)		(version >> 16) & 0xFF
+#define SME_VERSION_BUILD(version)		(version) & 0xFFFF
+
 #endif /* __SME_VERSION_H__ */

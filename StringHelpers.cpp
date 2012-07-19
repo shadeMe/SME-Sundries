@@ -64,16 +64,20 @@ namespace SME
 
 		bool ci_less(const char* lh, const char* rh)
 		{
-			ASSERT(lh && rh);
-			while (*lh && *rh) {
+			while (*lh && *rh)
+			{
 				char l = toupper(*lh);
 				char r = toupper(*rh);
-				if (l < r) {
+
+				if (l < r)
+				{
 					return true;
 				}
-				else if (l > r) {
+				else if (l > r)
+				{
 					return false;
 				}
+
 				lh++;
 				rh++;
 			}
@@ -95,7 +99,8 @@ namespace SME
 #pragma warning(disable: 4996)	// warning about std::transform()
 		void MakeUpper(char* str)
 		{
-			if (str) {
+			if (str)
+			{
 				UInt32 len = strlen(str);
 				std::transform(str, str + len, str, toupper);
 			}
@@ -105,6 +110,7 @@ namespace SME
 		std::wstring FormatWideString( const char* Format, ... )
 		{
 			char Buffer[0x1000] = {0};
+
 			va_list Args;
 			va_start(Args, Format);
 			vsprintf_s(Buffer, sizeof(Buffer), Format, Args);

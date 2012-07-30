@@ -131,5 +131,35 @@ namespace SME
 
 			return false;
 		}
+
+		COLORREF GetRGB( const char* String )
+		{
+			SME_ASSERT(String);
+
+			SME::StringHelpers::Tokenizer ColorParser(String, ", ");
+			int R = 0, G = 0, B = 0;
+
+			for (int i = 0; i < 3; i++)
+			{
+				std::string Buffer;
+				if (ColorParser.NextToken(Buffer) != -1)
+				{
+					switch (i)
+					{
+					case 0:		// R
+						R = atoi(Buffer.c_str());
+						break;
+					case 1:		// G
+						G = atoi(Buffer.c_str());
+						break;
+					case 2:		// B
+						B = atoi(Buffer.c_str());
+						break;
+					}
+				}
+			}
+
+			return RGB(R, G, B);
+		}
 	}
 }

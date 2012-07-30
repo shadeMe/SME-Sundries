@@ -32,5 +32,6 @@ namespace SME
 
 		std::wstring FormatWideString(const char* Format, ...);
 		bool GetHasNonAlnumCharacter(std::string& str);
+		COLORREF GetRGB(const char* String);
 	}
 }

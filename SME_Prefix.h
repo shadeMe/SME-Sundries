@@ -1,5 +1,6 @@
 #pragma once
 
+#ifndef __cplusplus_cli
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -35,6 +36,7 @@ extern "C"
 	_CRTIMP void __cdecl _wassert(_In_z_ const wchar_t * _Message, _In_z_ const wchar_t *_File, _In_ unsigned _Line);
 }
 #define SME_ASSERT(_Expression) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(#_Expression), _CRT_WIDE(__FILE__), __LINE__), 0) )
+#endif
 
 #pragma warning(push)
 #pragma warning(disable: 4005)

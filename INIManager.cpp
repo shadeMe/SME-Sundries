@@ -92,6 +92,49 @@ namespace SME
 			return !(*First < *Second);
 		}
 
+		bool INIManager::PopulateFromINI( void )
+		{
+			bool Result = false;
+			std::fstream INIStream(GetPath(), std::fstream::in);
+
+			if (INIStream.fail() == false)
+			{
+				char SectionNames[0x4000] = {0};
+				char SectionData[0x4000] = {0};
+
+				if (GetPrivateProfileSectionNames(SectionNames, sizeof(SectionNames), GetPath()))
+				{
+					for (const char* Section = SectionNames; *Section != '\0'; Section += strlen(Section) + 1)
+					{
+						ZeroMemory(SectionData, sizeof(SectionData));
+						DirectRead(Section, SectionData, sizeof(SectionData));
+
+						for (const char* Itr = SectionData; *Itr != '\0'; Itr += strlen(Itr) + 1)
+						{
+							std::string Entry(Itr);
+							size_t Delimiter = Entry.find("=");
+
+							if (Delimiter != std::string::npos)
+							{
+								std::string Key(Entry.substr(0, Delimiter));
+								std::string Value(Entry.substr(Delimiter + 1));
+
+								if (RegisterSetting(Key.c_str(), Section, Value.c_str(), ""))
+									FetchSetting(Key.c_str(), Section)->SetValue("%s", Value.c_str());
+							}
+						}
+					}
+
+					Result = true;
+				}
+			}
+
+			INIStream.close();
+			INIStream.clear();
+
+			return Result;
+		}
+
 		INISetting::INISetting(INIManager* Manager, const char* Key, const char* Section, const char* DefaultValue, const char* Description)
 		{
 			this->Key = Key;
@@ -176,6 +219,18 @@ namespace SME
 	//			Result = _stricmp(Key.c_str(), Second.Key.c_str());
 
 			return Result >= 0;
+		}
+
+		UInt32 INISetting::GetValueAsUnsignedInteger( bool AsHex /*= false*/ ) const
+		{
+			UInt32 Result = 0;
+
+			if (AsHex)
+				sscanf_s(Value.c_str(), "%08X", &Result);
+			else
+				sscanf_s(Value.c_str(), "%u", &Result);
+
+			return Result;
 		}
 
 		INIManagerIterator::INIManagerIterator(INIManager* Manager) :

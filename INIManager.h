@@ -26,7 +26,7 @@ namespace SME
 			INIManager();
 			virtual ~INIManager();
 
-			virtual void										Initialize(const char* INIPath, void* Paramenter) = 0;
+			virtual void										Initialize(const char* INIPath, void* Parameter) = 0;
 			virtual INISetting*									FetchSetting(const char* Key, const char* Section);
 
 			void												Save(void);
@@ -37,6 +37,8 @@ namespace SME
 			virtual int											DirectRead(const char* Section, char* OutBuffer, UInt32 Size);
 			virtual bool										DirectWrite(const char* Setting, const char* Section, const char* Value);
 			virtual bool										DirectWrite(const char* Section, const char* Value);
+
+			virtual bool										PopulateFromINI(void);
 		};
 
 		#define GetINI(key, section)							FetchSetting(key, section)
@@ -70,6 +72,7 @@ namespace SME
 			const char*											GetValueAsString(void) const;
 			int													GetValueAsInteger(void) const;
 			float												GetValueAsFloat(void) const;
+			UInt32												GetValueAsUnsignedInteger(bool AsHex = false) const;
 			void												SetValue(const char* Format, ...);
 		};
 

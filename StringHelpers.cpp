@@ -161,5 +161,24 @@ namespace SME
 
 			return RGB(R, G, B);
 		}
+
+		void Replace( std::string& Str, char Query, char Replacement )
+		{
+			std::replace(Str.begin(), Str.end(), Query, Replacement);
+		}
+
+		void Erase( std::string& Str, char Query )
+		{
+			for (std::string::iterator Itr = Str.begin(); Itr != Str.end();)
+			{
+				if (*Itr == Query)
+				{
+					Itr = Str.erase(Itr);
+					continue;
+				}
+
+				Itr++;
+			}
+		}
 	}
 }

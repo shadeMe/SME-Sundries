@@ -38,6 +38,7 @@ namespace SME
 			virtual bool										DirectWrite(const char* Setting, const char* Section, const char* Value);
 			virtual bool										DirectWrite(const char* Section, const char* Value);
 
+			virtual bool										PopulateFromSection(const char* Section);
 			virtual bool										PopulateFromINI(void);
 		};
 
@@ -81,16 +82,19 @@ namespace SME
 			UInt32												INIListSize;
 			INIManager::INISettingListT::const_iterator			Bookend;
 			INIManager::INISettingListT::const_iterator			Iterator;
+			const char*											Section;
 
 			INISetting*											CurrentSetting;
 			INIManager*											Manager;
 		public:
-			INIManagerIterator(INIManager* Manager);
-			virtual ~INIManagerIterator();
+			INIManagerIterator(INIManager* Manager, const char* Section = NULL);
+			~INIManagerIterator();
 
 			bool												GetDone() const;
 			const INISetting*									GetNextSetting();
 			const INISetting*									GetCurrentSetting() const;
+
+			const INISetting*									operator()() const;
 		};
 	}
 }

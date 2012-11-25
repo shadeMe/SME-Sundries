@@ -135,6 +135,35 @@ namespace SME
 			return Result;
 		}
 
+		bool INIManager::PopulateFromSection( const char* Section )
+		{
+			bool Result = false;
+
+			char SectionData[0x4000] = {0};
+
+			if (INIManager::DirectRead(Section, SectionData, sizeof(SectionData)))
+			{
+				for (const char* Itr = SectionData; *Itr != '\0'; Itr += strlen(Itr) + 1)
+				{
+					std::string Entry(Itr);
+					size_t Delimiter = Entry.find("=");
+
+					if (Delimiter != std::string::npos)
+					{
+						std::string Key(Entry.substr(0, Delimiter));
+						std::string Value(Entry.substr(Delimiter + 1));
+
+						if (RegisterSetting(Key.c_str(), Section, Value.c_str(), ""))
+							FetchSetting(Key.c_str(), Section)->SetValue("%s", Value.c_str());
+					}
+				}
+
+				Result = true;
+			}
+
+			return Result;
+		}
+
 		INISetting::INISetting(INIManager* Manager, const char* Key, const char* Section, const char* DefaultValue, const char* Description)
 		{
 			this->Key = Key;
@@ -233,8 +262,9 @@ namespace SME
 			return Result;
 		}
 
-		INIManagerIterator::INIManagerIterator(INIManager* Manager) :
-			Manager(Manager)
+		INIManagerIterator::INIManagerIterator( INIManager* Manager, const char* Section ) :
+			Manager(Manager),
+			Section(Section)
 		{
 			SME_ASSERT(Manager);
 
@@ -251,10 +281,21 @@ namespace SME
 
 		const INISetting* INIManagerIterator::GetNextSetting()
 		{
-			if (Iterator != Manager->SettingList.end() && ++Iterator != Manager->SettingList.end())
-				CurrentSetting = *Iterator;
-			else
-				CurrentSetting = NULL;
+			CurrentSetting = NULL;
+
+			if (Iterator != Manager->SettingList.end())
+			{
+				while (++Iterator != Manager->SettingList.end())
+				{
+					INISetting* Current = *Iterator;
+
+					if (Section == NULL || !_stricmp(Current->GetSection(), Section))
+					{
+						CurrentSetting = *Iterator;
+						break;
+					}
+				}
+			}
 
 			return CurrentSetting;
 		}
@@ -268,10 +309,15 @@ namespace SME
 
 		bool INIManagerIterator::GetDone() const
 		{
-			return CurrentSetting == 0;
+			return CurrentSetting == NULL;
 		}
 
 		const INISetting* INIManagerIterator::GetCurrentSetting() const
+		{
+			return CurrentSetting;
+		}
+
+		const INISetting* INIManagerIterator::operator()() const
 		{
 			return CurrentSetting;
 		}

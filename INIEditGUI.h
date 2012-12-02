@@ -19,6 +19,10 @@ namespace SME
 			HINSTANCE						ParentInstance;
 			HWND							ListViewHandle;
 
+			RECT							InitDialogBounds;
+			RECT							InitListViewBounds;
+			bool							HasChanges;
+
 			bool							CreateListView(HWND ParentHandle);
 			bool							PopulateListView(HWND ListViewHandle);
 			void							SaveSettings(HWND ListViewHandle);

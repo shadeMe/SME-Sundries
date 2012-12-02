@@ -55,6 +55,7 @@ namespace SME
 				if (ListView_InsertColumn(ListViewHandle, i, &lvc) == -1)
 					return false;
 			}
+
 			return true;
 		}
 
@@ -100,7 +101,9 @@ namespace SME
 					ListView_SetItem(ListViewHandle, &Name) == FALSE ||
 					ListView_SetItem(ListViewHandle, &Value) == FALSE ||
 					ListView_SetItem(ListViewHandle, &Desc) == FALSE)
+				{
 					return false;
+				}
 
 				Index++;
 			}
@@ -135,44 +138,109 @@ namespace SME
 
 			switch (uMsg)
 			{
+			case WM_SIZE:
+				{
+					RECT CurrentRect = {0};
+					RECT ButtonRect = {0};
+
+					HWND ListView = GetDlgItem(hWnd, LV_INILIST);
+
+					SetRect(&CurrentRect, 0, 0, LOWORD(lParam), HIWORD(lParam));
+					int DeltaDlgWidth = (CurrentRect.right - GUIInstance->InitDialogBounds.right);
+					int DeltaDlgHeight = (CurrentRect.bottom - GUIInstance->InitDialogBounds.bottom);
+					int VerticalScrollWidth = GetSystemMetrics(SM_CXVSCROLL) + 4;
+					HDWP DeferPosData = BeginDeferWindowPos(1);
+
+					DeferWindowPos(DeferPosData, ListView, NULL,
+								GUIInstance->InitListViewBounds.left,
+								GUIInstance->InitListViewBounds.top,
+								DeltaDlgWidth + GUIInstance->InitListViewBounds.right + VerticalScrollWidth,
+								CurrentRect.bottom + GUIInstance->InitListViewBounds.bottom - GUIInstance->InitDialogBounds.bottom,
+								NULL);
+
+					EndDeferWindowPos(DeferPosData);
+				}
+
+				break;
+			case WM_CLOSE:
+				{
+					if (GUIInstance->HasChanges)
+					{
+						switch (MessageBox(hWnd, "Do you want to save your changes?", "INI Manager GUI", MB_ICONQUESTION|MB_YESNOCANCEL))
+						{
+						case IDYES:
+							GUIInstance->SaveSettings(GetDlgItem(hWnd, LV_INILIST));
+							EndDialog(hWnd, NULL);
+
+							break;
+						case IDNO:
+							EndDialog(hWnd, NULL);
+
+							break;
+						default:
+							break;
+						}
+					}
+					else
+						EndDialog(hWnd, NULL);
+
+					return TRUE;
+				}
 			case WM_COMMAND:
 				switch (LOWORD(wParam))
 				{
 				case BTN_OK:
 					GUIInstance->SaveSettings(GetDlgItem(hWnd, LV_INILIST));
 					EndDialog(hWnd, NULL);
-					return TRUE;
-				case BTN_CANCEL:
-					EndDialog(hWnd, NULL);
+
 					return TRUE;
 				}
+
 				break;
 			case WM_NOTIFY:
 				switch (((LPNMHDR)lParam)->code)
 				{
 				case LVN_ITEMACTIVATE:
 					NMITEMACTIVATE* Data = (NMITEMACTIVATE*)lParam;
+
 					ListView_GetItemText(Data->hdr.hwndFrom, Data->iItem, 2, s_Buffer, sizeof(s_Buffer));
+
 					LPSTR Result = (LPSTR)DialogBoxParam(GUIInstance->ParentInstance, MAKEINTRESOURCE(DLG_TEXTEDIT), hWnd, (DLGPROC)TextEditDlgProc, (LPARAM)s_Buffer);
+
 					if (Result)
+					{
 						ListView_SetItemText(Data->hdr.hwndFrom, Data->iItem, 2, Result);
+						GUIInstance->HasChanges = true;
+					}
+
 					break;
 				}
+
 				break;
 			case WM_INITDIALOG:
-				SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG_PTR)lParam);
-				GUIInstance = (INIEditGUI*)lParam;
-
-				ListView_SetExtendedListViewStyle(GetDlgItem(hWnd, LV_INILIST), LVS_EX_FULLROWSELECT);
-				if (!GUIInstance->CreateListView(hWnd) || !GUIInstance->PopulateListView(GetDlgItem(hWnd, LV_INILIST)))
 				{
-					sprintf_s(s_Buffer, sizeof(s_Buffer), "Error encountered while creating controls.\n\nWin32API ErrorID: %d", GetLastError());
-					MessageBox(hWnd, s_Buffer, "INI Manager GUI", MB_OK);
-					EndDialog(hWnd, NULL);
-					return TRUE;
+					SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG_PTR)lParam);
+					GUIInstance = (INIEditGUI*)lParam;
+
+					ListView_SetExtendedListViewStyle(GetDlgItem(hWnd, LV_INILIST), LVS_EX_FULLROWSELECT);
+
+					if (GUIInstance->CreateListView(hWnd) == false || GUIInstance->PopulateListView(GetDlgItem(hWnd, LV_INILIST)) == false)
+					{
+						sprintf_s(s_Buffer, sizeof(s_Buffer), "Error encountered while creating controls.\n\nWin32API ErrorID: %d", GetLastError());
+						MessageBox(hWnd, s_Buffer, "INI Manager GUI", MB_OK);
+						EndDialog(hWnd, NULL);
+
+						return TRUE;
+					}
+
+					GetClientRect(hWnd, &GUIInstance->InitDialogBounds);
+					SME::UIHelpers::GetClientRectInitBounds(GetDlgItem(hWnd, LV_INILIST), hWnd, &GUIInstance->InitListViewBounds);
+					GUIInstance->HasChanges = false;
 				}
+
 				break;
 			}
+
 			return FALSE;
 		}
 
@@ -186,16 +254,21 @@ namespace SME
 				case BTN_OK:
 					GetDlgItemText(hWnd, EDIT_TEXTLINE, s_Buffer, sizeof(s_Buffer));
 					EndDialog(hWnd, (INT_PTR)s_Buffer);
+
 					return TRUE;
 				case BTN_CANCEL:
 					EndDialog(hWnd, NULL);
+
 					return TRUE;
 				}
+
 				break;
 			case WM_INITDIALOG:
 				SetDlgItemText(hWnd, EDIT_TEXTLINE, (LPSTR)lParam);
+
 				break;
 			}
+
 			return FALSE;
 		}
 	}

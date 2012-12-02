@@ -7,5 +7,7 @@ namespace SME
 	namespace UIHelpers
 	{
 #include "WindowEdgeSnapper.inl"
+
+		void GetClientRectInitBounds(HWND Window, HWND Parent, RECT* OutBounds);
 	}
 }

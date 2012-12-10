@@ -1,6 +1,7 @@
 var today = new Date();
 var day = today.getDate();
 var month = today.getMonth() + 1;
+var year = today.getFullYear();
 
 var fso   = new ActiveXObject("Scripting.FileSystemObject");
 var buildInfo = fso.CreateTextFile("BuildInfo.h", true);
@@ -9,13 +10,29 @@ if (day < 10) {
 	day = "0" + day;
 }
 
-buildInfo.WriteLine( "#define VERSION_BUILD               " + month + "" + day);
+buildInfo.WriteLine( "#define VERSION_BUILD " + month + "" + day);
 
 if (month < 10) {
-	month= "0" + month;
+	month = "0" + month;
 }
 
-buildInfo.WriteLine( "#define VERSION_BUILD_PAD       " + month + "" + day);
+buildInfo.WriteLine( "#define VERSION_BUILD_PAD " + month + "" + day);
+
+
+var sumyear = 0;
+while (year > 0) {
+	sumyear += Math.floor(year % 10);
+	year = year / 10;
+}
+
+buildInfo.WriteLine( "#define VERSION_REVISION " + sumyear);
+
+if (sumyear < 10) {
+	sumyear = "0" + sumyear;
+}
+
+buildInfo.WriteLine( "#define VERSION_REVISION_PAD " + sumyear);
+
 buildInfo.Close();
 
 

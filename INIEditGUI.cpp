@@ -7,8 +7,6 @@ namespace SME
 {
 	namespace INI
 	{
-		static char			s_Buffer[0x200] = {0};
-
 		void INIEditGUI::InitializeGUI(HINSTANCE ParentInstance, HWND ParentHWND, INIManager* ParentINIManager)
 		{
 			this->ParentManager = ParentINIManager;
@@ -62,6 +60,8 @@ namespace SME
 		bool INIEditGUI::PopulateListView(HWND ListViewHandle)
 		{
 			UInt32 Index = 0;
+			char Buffer[0x200] = {0};
+
 			for (INIManagerIterator Itr(ParentManager); Itr.GetDone() == 0; Itr.GetNextSetting())
 			{
 				const INISetting* Setting = Itr.GetCurrentSetting();
@@ -87,7 +87,7 @@ namespace SME
 				Value.iSubItem = 2;
 				Value.state = 0;
 				Value.stateMask = 0;
-				Value.pszText = (LPSTR)Setting->GetValueAsString();
+				Value.pszText = (LPSTR)Buffer;
 				Value.iItem = Index;
 
 				Desc.mask = LVIF_TEXT | LVIF_STATE;
@@ -96,6 +96,8 @@ namespace SME
 				Desc.stateMask = 0;
 				Desc.pszText = (LPSTR)Setting->GetDescription();
 				Desc.iItem = Index;
+
+				Setting->GetDataAsString(Buffer, sizeof(Buffer));
 
 				if (ListView_InsertItem(ListViewHandle, &Section) == -1 ||
 					ListView_SetItem(ListViewHandle, &Name) == FALSE ||
@@ -114,6 +116,7 @@ namespace SME
 		void INIEditGUI::SaveSettings(HWND ListViewHandle)
 		{
 			UInt32 ItemCount = ListView_GetItemCount(ListViewHandle);
+			char Buffer[0x200] = {0};
 
 			for (int i = 0; i < ItemCount; i++)
 			{
@@ -126,9 +129,9 @@ namespace SME
 				ListView_GetItem(ListViewHandle, &Item);
 
 				INISetting* Setting = (INISetting*)Item.lParam;
-				ListView_GetItemText(ListViewHandle, i, 2, s_Buffer, sizeof(s_Buffer));
+				ListView_GetItemText(ListViewHandle, i, 2, Buffer, sizeof(Buffer));
 
-				Setting->SetValue(s_Buffer);
+				Setting->SetDataAsString(Buffer);
 			}
 		}
 
@@ -201,16 +204,19 @@ namespace SME
 				switch (((LPNMHDR)lParam)->code)
 				{
 				case LVN_ITEMACTIVATE:
-					NMITEMACTIVATE* Data = (NMITEMACTIVATE*)lParam;
-
-					ListView_GetItemText(Data->hdr.hwndFrom, Data->iItem, 2, s_Buffer, sizeof(s_Buffer));
-
-					LPSTR Result = (LPSTR)DialogBoxParam(GUIInstance->ParentInstance, MAKEINTRESOURCE(DLG_TEXTEDIT), hWnd, (DLGPROC)TextEditDlgProc, (LPARAM)s_Buffer);
-
-					if (Result)
 					{
-						ListView_SetItemText(Data->hdr.hwndFrom, Data->iItem, 2, Result);
-						GUIInstance->HasChanges = true;
+						NMITEMACTIVATE* Data = (NMITEMACTIVATE*)lParam;
+						char Buffer[0x200] = {0};
+
+						ListView_GetItemText(Data->hdr.hwndFrom, Data->iItem, 2, Buffer, sizeof(Buffer));
+
+						LPSTR Result = (LPSTR)DialogBoxParam(GUIInstance->ParentInstance, MAKEINTRESOURCE(DLG_TEXTEDIT), hWnd, (DLGPROC)TextEditDlgProc, (LPARAM)Buffer);
+
+						if (Result)
+						{
+							ListView_SetItemText(Data->hdr.hwndFrom, Data->iItem, 2, Result);
+							GUIInstance->HasChanges = true;
+						}
 					}
 
 					break;
@@ -226,8 +232,9 @@ namespace SME
 
 					if (GUIInstance->CreateListView(hWnd) == false || GUIInstance->PopulateListView(GetDlgItem(hWnd, LV_INILIST)) == false)
 					{
-						sprintf_s(s_Buffer, sizeof(s_Buffer), "Error encountered while creating controls.\n\nWin32API ErrorID: %d", GetLastError());
-						MessageBox(hWnd, s_Buffer, "INI Manager GUI", MB_OK);
+						char Buffer[0x200] = {0};
+						FORMAT_STR(Buffer, "Error encountered while creating controls.\n\nWin32API ErrorID: %d", GetLastError());
+						MessageBox(hWnd, Buffer, "INI Manager GUI", MB_OK);
 						EndDialog(hWnd, NULL);
 
 						return TRUE;
@@ -246,14 +253,16 @@ namespace SME
 
 		BOOL CALLBACK TextEditDlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
+			char* Buffer = (char*)GetWindowLongPtr(hWnd, GWL_USERDATA);
+
 			switch (uMsg)
 			{
 			case WM_COMMAND:
 				switch (LOWORD(wParam))
 				{
 				case BTN_OK:
-					GetDlgItemText(hWnd, EDIT_TEXTLINE, s_Buffer, sizeof(s_Buffer));
-					EndDialog(hWnd, (INT_PTR)s_Buffer);
+					GetDlgItemText(hWnd, EDIT_TEXTLINE, Buffer, 0x200);
+					EndDialog(hWnd, (INT_PTR)Buffer);
 
 					return TRUE;
 				case BTN_CANCEL:
@@ -265,6 +274,7 @@ namespace SME
 				break;
 			case WM_INITDIALOG:
 				SetDlgItemText(hWnd, EDIT_TEXTLINE, (LPSTR)lParam);
+				SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG_PTR)lParam);
 
 				break;
 			}

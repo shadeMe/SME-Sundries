@@ -1,6 +1,8 @@
 #pragma once
 
-// SME::INI - A simple INI managing class that allows INI settings to be registered to a database.
+#include "SME_Prefix.h"
+
+// SME::INI - INI managing classes and associated bollocks
 
 namespace SME
 {

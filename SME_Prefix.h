@@ -13,6 +13,7 @@
 #include <fstream>
 #include <windows.h>
 #include <commctrl.h>
+#include <time.h>
 
 typedef unsigned char		UInt8;		//!< An unsigned 8-bit integer value
 typedef unsigned short		UInt16;		//!< An unsigned 16-bit integer value

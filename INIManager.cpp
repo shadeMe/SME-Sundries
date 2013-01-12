@@ -1,3 +1,5 @@
+#pragma warning(disable: 4800)
+
 #include "INIManager.h"
 
 namespace SME

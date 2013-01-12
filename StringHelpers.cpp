@@ -105,7 +105,6 @@ namespace SME
 				std::transform(str, str + len, str, toupper);
 			}
 		}
-#pragma warning(pop)
 
 		std::wstring FormatWideString( const char* Format, ... )
 		{
@@ -120,6 +119,7 @@ namespace SME
 			mbstowcs(WideBuffer, Buffer, strlen(Buffer));
 			return WideBuffer;
 		}
+#pragma warning(pop)
 
 		bool GetHasNonAlnumCharacter( std::string& str )
 		{

@@ -122,6 +122,7 @@ namespace SME
 			Description(Description),
 			Type(kType_String)
 		{
+			Data.s = NULL;
 			SetCString(&Data.s, Value);
 		}
 
@@ -267,7 +268,9 @@ namespace SME
 
 		INIManager::~INIManager()
 		{
-			Save();
+			// don't save registered settings here, call the save method explicitly when required
+			// will cause undefined behaviour if the settings and the manager are statically allocated
+			// as the d'tor thunks can get called out of order, i.e., the settings get destroyed before manager
 
 			for (INISettingListT::iterator Itr = DynamicSettings.begin(); Itr != DynamicSettings.end(); Itr++)
 				delete *Itr;

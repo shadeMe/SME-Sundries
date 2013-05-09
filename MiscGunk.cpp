@@ -25,7 +25,7 @@ namespace SME
 			return TimePassed;
 		}
 
-		const char* GetTimeString( char* Out, size_t Size, const char* FormatString /*= "%m--%d--%Y %H-%M-%S"*/ )
+		const char* GetTimeString( char* Out, size_t Size, const char* FormatString )
 		{
 			__time32_t TimeData;
 			tm LocalTime;
@@ -34,6 +34,15 @@ namespace SME
 			_localtime32_s(&LocalTime, &TimeData);
 			strftime(Out, Size, FormatString, &LocalTime);
 			return Out;
+		}
+
+		const char* GetTimeString(std::string& Out, const char* FormatString)
+		{
+			char Buffer[0x100] = {0};
+			GetTimeString(Buffer, sizeof(Buffer), FormatString);
+			Out = Buffer;
+
+			return Out.c_str();
 		}
 
 		void ToggleFlag(UInt8* Flag, UInt32 Mask, bool State)

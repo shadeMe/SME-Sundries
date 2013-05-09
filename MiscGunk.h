@@ -41,6 +41,8 @@ namespace SME
 		};
 
 		const char* GetTimeString(char* Out, size_t Size, const char* FormatString = "%m--%d--%Y %H-%M-%S");
+		const char* GetTimeString(std::string& Out, const char* FormatString = "%m--%d--%Y %H-%M-%S");
+
 		void ToggleFlag(UInt8* Flag, UInt32 Mask, bool State);
 		void ToggleFlag(UInt16* Flag, UInt32 Mask, bool State);
 		void ToggleFlag(UInt32* Flag, UInt32 Mask, bool State);

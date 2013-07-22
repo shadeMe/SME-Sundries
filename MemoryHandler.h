@@ -106,6 +106,9 @@ namespace SME
 
 		#define zz___HookHdlrFnVariable(Name, Variable)							k##Name##Hook##Variable##Addr
 		#define zz__HookHdlrFnVariable(Name, Variable)							zz___HookHdlrFnVariable(Name, Variable)
+		
+		// used to easily identify mem addrs
+		#define VOLATILE(MemoryAddress)											MemoryAddress
 
 		#pragma region Executable Code Handlers
 			// cdecl convention

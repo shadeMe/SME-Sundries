@@ -142,9 +142,9 @@ CODE { COLOR: #990000; FONT-FAMILY: "Courier New", Courier, mono; }
 			<li>The name of the Author may not be used to endorse or promote products derived from
 				the Work without the prior written consent of the Author.</li>
 			<li>You agree not to sell, lease, or rent any part of the Work. This does not restrict
-			    you from including the Work or any part of the Work inside a larger software
-			    distribution that itself is being sold. The Work by itself, though, cannot be sold,
-			    leased or rented.</li>
+				you from including the Work or any part of the Work inside a larger software
+				distribution that itself is being sold. The Work by itself, though, cannot be sold,
+				leased or rented.</li>
 			<li>You may distribute the Executable Files and Source Code only under the terms of
 				this License, and You must include a copy of, or the Uniform Resource Identifier
 				for, this License with every copy of the Executable Files or Source Code You distribute
@@ -266,98 +266,98 @@ class CSnapWindow
 #endif
 {
 public:
-    int snap_Margin, snap_ModifierKey;
+	int snap_Margin, snap_ModifierKey;
 
 #ifdef __ATLBASE_H__
-    BEGIN_MSG_MAP(CSnapWindow<T>)
-        MESSAGE_HANDLER(WM_MOVING, OnSnapMoving)
-        MESSAGE_HANDLER(WM_ENTERSIZEMOVE, OnSnapEnterSizeMove)
-    END_MSG_MAP()
+	BEGIN_MSG_MAP(CSnapWindow<T>)
+		MESSAGE_HANDLER(WM_MOVING, OnSnapMoving)
+		MESSAGE_HANDLER(WM_ENTERSIZEMOVE, OnSnapEnterSizeMove)
+	END_MSG_MAP()
 #endif
 
 #ifdef __ATLBASE_H__
-    virtual LRESULT OnSnapEnterSizeMove(UINT uMsg, WPARAM wParam, LPARAM lParam,
-       BOOL& bHandled)
+	virtual LRESULT OnSnapEnterSizeMove(UINT uMsg, WPARAM wParam, LPARAM lParam,
+	   BOOL& bHandled)
 #else
-    virtual LRESULT OnSnapEnterSizeMove(HWND hWnd, UINT message, WPARAM wParam,
-       LPARAM lParam)
+	virtual LRESULT OnSnapEnterSizeMove(HWND hWnd, UINT message, WPARAM wParam,
+	   LPARAM lParam)
 #endif
-            {
-                snap_cur_pos.x=0;
-                snap_cur_pos.y=0;
+			{
+				snap_cur_pos.x=0;
+				snap_cur_pos.y=0;
 
-                snap_rcWindow.bottom=0;
-                snap_rcWindow.left=0;
-                snap_rcWindow.right=0;
-                snap_rcWindow.top=0;
+				snap_rcWindow.bottom=0;
+				snap_rcWindow.left=0;
+				snap_rcWindow.right=0;
+				snap_rcWindow.top=0;
 
-            #ifdef __ATLBASE_H__
-                T* pT = static_cast<T*>(this);
-                GetWindowRect(pT->m_hWnd, &snap_rcWindow );
-            #else
-                GetWindowRect(hWnd, &snap_rcWindow );
-            #endif
+			#ifdef __ATLBASE_H__
+				T* pT = static_cast<T*>(this);
+				GetWindowRect(pT->m_hWnd, &snap_rcWindow );
+			#else
+				GetWindowRect(hWnd, &snap_rcWindow );
+			#endif
 
-                    GetCursorPos( &snap_cur_pos );
+					GetCursorPos( &snap_cur_pos );
 
-                    snap_x = snap_cur_pos.x - snap_rcWindow.left;
-                    snap_y = snap_cur_pos.y - snap_rcWindow.top;
-                return 0;
-                }
+					snap_x = snap_cur_pos.x - snap_rcWindow.left;
+					snap_y = snap_cur_pos.y - snap_rcWindow.top;
+				return 0;
+				}
 
 #ifdef __ATLBASE_H__
-    virtual LRESULT OnSnapMoving(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	virtual LRESULT OnSnapMoving(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 #else
-    virtual LRESULT OnSnapMoving(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+	virtual LRESULT OnSnapMoving(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
-            {
-                //no snap if modifier key pressed
-                if (GetAsyncKeyState(snap_ModifierKey) < 0) return FALSE;
+			{
+				//no snap if modifier key pressed
+				if (GetAsyncKeyState(snap_ModifierKey) < 0) return FALSE;
 
-                snap_prc = (LPRECT)lParam;
+				snap_prc = (LPRECT)lParam;
 
-                snap_cur_pos.x=0;
-                snap_cur_pos.y=0;
-                snap_rcWindow.bottom=0;
-                snap_rcWindow.left=0;
-                snap_rcWindow.right=0;
-                snap_rcWindow.top=0;
+				snap_cur_pos.x=0;
+				snap_cur_pos.y=0;
+				snap_rcWindow.bottom=0;
+				snap_rcWindow.left=0;
+				snap_rcWindow.right=0;
+				snap_rcWindow.top=0;
 
-                GetCursorPos( &snap_cur_pos );
-                OffsetRect( snap_prc,
-                        snap_cur_pos.x - (snap_prc->left + snap_x) ,
-                        snap_cur_pos.y - (snap_prc->top + snap_y) );
+				GetCursorPos( &snap_cur_pos );
+				OffsetRect( snap_prc,
+						snap_cur_pos.x - (snap_prc->left + snap_x) ,
+						snap_cur_pos.y - (snap_prc->top + snap_y) );
 
-                //working area may change during app lifetime
-                SystemParametersInfo( SPI_GETWORKAREA, 0, &snap_wa, 0 );
+				//working area may change during app lifetime
+				SystemParametersInfo( SPI_GETWORKAREA, 0, &snap_wa, 0 );
 
-                if (isSnapClose( snap_prc->left, snap_wa.left ))
-                    {OffsetRect( snap_prc, snap_wa.left - snap_prc->left, 0);}
-                else
-                    if (isSnapClose( snap_wa.right, snap_prc->right ))
-                        {OffsetRect( snap_prc, snap_wa.right - snap_prc->right, 0);}
+				if (isSnapClose( snap_prc->left, snap_wa.left ))
+					{OffsetRect( snap_prc, snap_wa.left - snap_prc->left, 0);}
+				else
+					if (isSnapClose( snap_wa.right, snap_prc->right ))
+						{OffsetRect( snap_prc, snap_wa.right - snap_prc->right, 0);}
 
-                if (isSnapClose( snap_prc->top, snap_wa.top ))
-                    {OffsetRect( snap_prc, 0, snap_wa.top - snap_prc->top );}
-                else
-                    if (isSnapClose( snap_wa.bottom, snap_prc->bottom ))
-                        {OffsetRect( snap_prc, 0, snap_wa.bottom - snap_prc->bottom );}
-                return TRUE;
-                }
+				if (isSnapClose( snap_prc->top, snap_wa.top ))
+					{OffsetRect( snap_prc, 0, snap_wa.top - snap_prc->top );}
+				else
+					if (isSnapClose( snap_wa.bottom, snap_prc->bottom ))
+						{OffsetRect( snap_prc, 0, snap_wa.bottom - snap_prc->bottom );}
+				return TRUE;
+				}
 
-    virtual BOOL isSnapClose( int a, int b ) { return (abs( a - b ) < snap_Margin);}
+	virtual BOOL isSnapClose( int a, int b ) { return (abs( a - b ) < snap_Margin);}
 
-    CSnapWindow()
-        {
-        snap_ModifierKey=VK_SHIFT;
-        NONCLIENTMETRICS ncm = { 0 };
-        ncm.cbSize = sizeof ncm;
-        SystemParametersInfo( SPI_GETNONCLIENTMETRICS, 0, &ncm, 0 );
-        snap_Margin=ncm.iCaptionHeight;
-        }
+	CSnapWindow()
+		{
+		snap_ModifierKey=VK_SHIFT;
+		NONCLIENTMETRICS ncm = { 0 };
+		ncm.cbSize = sizeof ncm;
+		SystemParametersInfo( SPI_GETNONCLIENTMETRICS, 0, &ncm, 0 );
+		snap_Margin=ncm.iCaptionHeight;
+		}
 private:
-    POINT snap_cur_pos;
-    RECT snap_rcWindow, snap_wa, *snap_prc;
-    int snap_x, snap_y;
+	POINT snap_cur_pos;
+	RECT snap_rcWindow, snap_wa, *snap_prc;
+	int snap_x, snap_y;
 };
 #endif//_0C46500C_084D_44ac_8C26_37E38BED2714_

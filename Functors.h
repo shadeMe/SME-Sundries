@@ -1,23 +1,27 @@
-#pragma once
-
 // SME::Functors - Basic functor implementations
 
+#ifndef __SME_SUNDRIES_FUNCTORS_H__
+#define __SME_SUNDRIES_FUNCTORS_H__
 namespace SME
 {
 	namespace Functors
 	{
 		class GenericFunctorBase
 		{
-		protected:
-			GenericFunctorBase();
 		public:
-			virtual ~GenericFunctorBase();
+			virtual ~GenericFunctorBase()
+			{
+				;//
+			}
 		};
 
 		class VoidRFunctorBase : public GenericFunctorBase
 		{
 		public:
-			virtual ~VoidRFunctorBase();
+			virtual ~VoidRFunctorBase()
+			{
+				;//
+			}
 
 			virtual void		operator()() = 0;
 		};
@@ -25,7 +29,10 @@ namespace SME
 		class BoolRFunctorBase : public GenericFunctorBase
 		{
 		public:
-			virtual ~BoolRFunctorBase();
+			virtual ~BoolRFunctorBase()
+			{
+				;//
+			}
 
 			virtual bool		operator()() = 0;
 		};
@@ -33,7 +40,10 @@ namespace SME
 		class UInt32RFunctorBase : public GenericFunctorBase
 		{
 		public:
-			virtual ~UInt32RFunctorBase();
+			virtual ~UInt32RFunctorBase()
+			{
+				;//
+			}
 
 			virtual UInt32		operator()() = 0;
 		};
@@ -64,3 +74,4 @@ namespace SME
 		typedef GetterTFunctorBase<LPDIRECT3DDEVICE9>			D3D9DeviceGetter;
 	}
 }
+#endif

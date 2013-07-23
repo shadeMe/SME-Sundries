@@ -1,21 +1,104 @@
-#pragma once
-
 // SME::MemoryHandler - Memory Handler classes
 // The executable code handlers were directly ripped off from JRoush's COEF API - Kudos to the mustached llama
+
+#ifndef __SME_SUNDRIES_MEMORYHANDLER_H__
+#define __SME_SUNDRIES_MEMORYHANDLER_H__
+
+#include "SME_Prefix.h"
 
 namespace SME
 {
 	namespace MemoryHandler
 	{
+		inline void	SafeWrite8(UInt32 addr, UInt32 data)
+		{
+			UInt32	oldProtect;
+
+			VirtualProtect((void *)addr, 4, PAGE_EXECUTE_READWRITE, &oldProtect);
+			*((UInt8 *)addr) = data;
+			VirtualProtect((void *)addr, 4, oldProtect, &oldProtect);
+		}
+
+		inline void	SafeWrite16(UInt32 addr, UInt32 data)
+		{
+			UInt32	oldProtect;
+
+			VirtualProtect((void *)addr, 4, PAGE_EXECUTE_READWRITE, &oldProtect);
+			*((UInt16 *)addr) = data;
+			VirtualProtect((void *)addr, 4, oldProtect, &oldProtect);
+		}
+
+		inline void	SafeWrite32(UInt32 addr, UInt32 data)
+		{
+			UInt32	oldProtect;
+
+			VirtualProtect((void *)addr, 4, PAGE_EXECUTE_READWRITE, &oldProtect);
+			*((UInt32 *)addr) = data;
+			VirtualProtect((void *)addr, 4, oldProtect, &oldProtect);
+		}
+
+		inline void	SafeWriteBuf(UInt32 addr, void * data, UInt32 len)
+		{
+			UInt32	oldProtect;
+
+			VirtualProtect((void *)addr, len, PAGE_EXECUTE_READWRITE, &oldProtect);
+			memcpy((void *)addr, data, len);
+			VirtualProtect((void *)addr, len, oldProtect, &oldProtect);
+		}
+
+		inline void	WriteRelJump(UInt32 jumpSrc, UInt32 jumpTgt)
+		{
+			// jmp rel32
+			SafeWrite8(jumpSrc, 0xE9);
+			SafeWrite32(jumpSrc + 1, jumpTgt - jumpSrc - 1 - 4);
+		}
+
+		inline void	WriteRelCall(UInt32 jumpSrc, UInt32 jumpTgt)
+		{
+			// call rel32
+			SafeWrite8(jumpSrc, 0xE8);
+			SafeWrite32(jumpSrc + 1, jumpTgt - jumpSrc - 1 - 4);
+		}
+
+		inline UInt8*	MakeUInt8Array(UInt32 Size, ...)
+		{
+			va_list Args;
+			UInt8* ResultArray = new UInt8[Size];
+
+			va_start(Args, Size);
+			for (int i = 0; i < Size; i++)
+			{
+				UInt8 Value = va_arg(Args, UInt8);
+				ResultArray[i] = Value;
+			}
+			va_end(Args);
+
+			return ResultArray;
+		}
+
 		class Handler_Nop
 		{
 			UInt32				m_Address;
 			UInt32				m_Size;
 		public:
-			Handler_Nop(UInt32 PatchAddr, UInt32 Size);
+			Handler_Nop(UInt32 PatchAddr, UInt32 Size) :
+				m_Address(PatchAddr),
+				m_Size(Size)
+			{
+				;//
+			}
 
-			void				WriteNop();
+			void				WriteNop()
+			{
+				if (m_Address == 0)
+					return;
+
+				for (int i = 0; i < m_Size; i++) {
+					SafeWrite8(m_Address + i, 0x90);
+				}
+			}
 		};
+
 		typedef Handler_Nop NopHdlr;
 
 		class Handler_Ace
@@ -25,29 +108,91 @@ namespace SME
 			UInt8*				m_Buffer;
 			UInt32				m_BufferSize;
 		public:
-			Handler_Ace(UInt32 HookAddr, UInt32 JumpAddr, UInt8* Buffer, UInt32 BufferSize);
-			Handler_Ace(UInt32 HookAddr, void* JumpAddr, UInt8* Buffer, UInt32 BufferSize);
-			~Handler_Ace();
+			Handler_Ace(UInt32 HookAddr, UInt32 JumpAddr, UInt8* Buffer, UInt32 BufferSize) :
+				m_AddressA(HookAddr),
+				m_AddressB(JumpAddr),
+				m_Buffer(Buffer),
+				m_BufferSize(BufferSize)
+			{
+				;//
+			}
 
-			void				WriteJump();
-			void				WriteCall();
-			void				WriteCall(void* CallAddr);
+			Handler_Ace(UInt32 HookAddr, void* JumpAddr, UInt8* Buffer, UInt32 BufferSize) :
+				m_AddressA(HookAddr),
+				m_AddressB((UInt32)JumpAddr),
+				m_Buffer(Buffer),
+				m_BufferSize(BufferSize)
+			{
+				;//
+			}
 
-			void				WriteBuffer();
-			void				WriteUInt32(UInt32 Data);
-			void				WriteUInt16(UInt16 Data);
-			void				WriteUInt8(UInt8 Data);
+			~Handler_Ace()
+			{
+				SAFEDELETE_ARRAY(m_Buffer);
+			}
+
+			void				WriteJump()
+			{
+				if (m_AddressA == 0 || m_AddressB == 0)
+					return;
+
+				WriteRelJump(m_AddressA, m_AddressB);
+			}
+
+			void				WriteCall()
+			{
+				if (m_AddressA == 0 || m_AddressB == 0)
+					return;
+
+				WriteRelCall(m_AddressA, m_AddressB);
+			}
+
+			void				WriteCall(void* CallAddr)
+			{
+				if (m_AddressA == 0)
+					return;
+
+				WriteRelCall(m_AddressA, (UInt32)CallAddr);
+			}
+
+			void				WriteBuffer()
+			{
+				if (m_Buffer == 0 || m_BufferSize == 0 || m_AddressA == 0)
+					return;
+
+				for (int i = 0; i < m_BufferSize; i++) {
+					SafeWrite8(m_AddressA + i, m_Buffer[i]);
+				}
+			}
+
+			void				WriteUInt32(UInt32 Data)
+			{
+				if (m_AddressA == 0)
+					return;
+
+				SafeWrite32(m_AddressA, Data);
+			}
+
+			void				WriteUInt16(UInt16 Data)
+			{
+				if (m_AddressA == 0)
+					return;
+
+				SafeWrite16(m_AddressA, Data);
+			}
+
+			void				WriteUInt8(UInt8 Data)
+			{
+				if (m_AddressA == 0)
+					return;
+
+				SafeWrite8(m_AddressA, Data);
+			}
 		};
+
 		typedef Handler_Ace MemHdlr;
 
-		void	SafeWrite8(UInt32 addr, UInt32 data);
-		void	SafeWrite16(UInt32 addr, UInt32 data);
-		void	SafeWrite32(UInt32 addr, UInt32 data);
-		void	SafeWriteBuf(UInt32 addr, void * data, UInt32 len);
-		void	WriteRelJump(UInt32 jumpSrc, UInt32 jumpTgt);
-		void	WriteRelCall(UInt32 jumpSrc, UInt32 jumpTgt);
-		UInt8*	MakeUInt8Array(UInt32 Size, ...);
-
+		// Helper macros
 		#define _DeclareMemHdlr(Name, Comment)									extern MemHdlr		kMemHdlr##Name; void Name##Hook(void)
 		#define _DeclareNopHdlr(Name, Comment)									extern NopHdlr		kMemHdlr##Name
 
@@ -339,3 +484,4 @@ namespace SME
 		#pragma endregion
 	}
 }
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __SME_SUNDRIES_PREFIX_H__
+#define __SME_SUNDRIES_PREFIX_H__
 
 #ifndef __cplusplus_cli
 #include <cstdlib>
@@ -26,9 +27,6 @@ typedef signed long long	SInt64;		//!< A signed 64-bit integer value
 typedef float				Float32;	//!< A 32-bit floating point value
 typedef double				Float64;	//!< A 64-bit floating point value
 
-#define SAFEDELETE(X)				if (X)	{ delete X; X = NULL; }
-#define SAFEDELETE_ARRAY(X)			if (X)	{ delete [] X; X = NULL; }
-#define SAFERELEASE_D3D(X)			if (X)	{ X->Release(); X = NULL; }
 #define FORMAT_STR(Buffer, ...)		sprintf_s(Buffer, sizeof(Buffer), ##__VA_ARGS__)
 
 #undef SME_ASSERT
@@ -38,6 +36,10 @@ extern "C"
 }
 #define SME_ASSERT(_Expression) (void)( (!!(_Expression)) || (_wassert(_CRT_WIDE(#_Expression), _CRT_WIDE(__FILE__), __LINE__), 0) )
 #endif
+
+#define SAFEDELETE(X)				if (X)	{ delete X; X = NULL; }
+#define SAFEDELETE_ARRAY(X)			if (X)	{ delete [] X; X = NULL; }
+#define SAFERELEASE_D3D(X)			if (X)	{ X->Release(); X = NULL; }
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
@@ -51,3 +53,4 @@ extern "C"
 #define HACK(X)							__pragma( message ( __STR1__( COMPILER_WARNING(X) ) ) )
 #define PANIC(X)						__pragma( message ( __STR1__( COMPILER_ERROR(X) ) ) )
 #pragma warning(pop)
+#endif

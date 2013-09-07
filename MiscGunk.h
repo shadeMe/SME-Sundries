@@ -12,27 +12,30 @@ namespace SME
 	{
 		class ElapsedTimeCounter
 		{
-			LARGE_INTEGER				ReferenceFrame;
-			LARGE_INTEGER				FrameBuffer;
-			LARGE_INTEGER				TimerFrequency;
-			long double					TimePassed;
+			__int64				ReferenceFrame;
+			double				Frequency;
+			double				TimePassed;
 		public:
 			ElapsedTimeCounter()
 			{
-				QueryPerformanceCounter(&ReferenceFrame);
-				QueryPerformanceFrequency(&TimerFrequency);
-
-				Update();
+				LARGE_INTEGER FrameBuffer;
+				
+				QueryPerformanceFrequency(&FrameBuffer);
+				Frequency = double(FrameBuffer.QuadPart) / 1000.0;
+				QueryPerformanceCounter(&FrameBuffer);
+				ReferenceFrame = FrameBuffer.QuadPart;
 			}
 
 			void						Update(void)
 			{
+				LARGE_INTEGER FrameBuffer;
+
 				QueryPerformanceCounter(&FrameBuffer);
-				TimePassed = ((FrameBuffer.QuadPart - ReferenceFrame.QuadPart ) * 1000.0 / TimerFrequency.QuadPart);
-				ReferenceFrame = FrameBuffer;
+				TimePassed = double(FrameBuffer.QuadPart - ReferenceFrame) / Frequency;
+				ReferenceFrame = FrameBuffer.QuadPart;
 			}
 
-			long double					GetTimePassed(void) const		// b'ween the last 2 consecutive calls to Update(), in ms
+			double						GetTimePassed(void) const		// b'ween the last 2 consecutive calls to Update(), in ms
 			{
 				return TimePassed;
 			}

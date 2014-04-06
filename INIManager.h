@@ -58,13 +58,12 @@ namespace SME
 			~INISetting();
 
 			bool						operator<(const INISetting& Second);
+			const Store&				operator()(void) const;
 
 			const char*					GetKey(void) const;
 			const char*					GetSection(void) const;
 			const char*					GetDescription(void) const;
 			const UInt8					GetType(void) const;
-
-			const Store&				GetData(void) const;
 
 			void						SetInt(SInt32 Value);
 			void						SetUInt(UInt32 Value);
@@ -196,7 +195,7 @@ namespace SME
 			if (strlen(Manager->GetPath()) < 2)
 				return false;
 
-			char Buffer[0x200] = {0};
+			char Buffer[0x4000] = {0};
 			Serialize(Buffer, sizeof(Buffer));
 
 			if (!WritePrivateProfileStringA(Section.c_str(), Key.c_str(), Buffer, Manager->GetPath()))
@@ -210,7 +209,7 @@ namespace SME
 			if (strlen(Manager->GetPath()) < 2)
 				return;
 
-			char Buffer[0x200] = {0}, Default[0x200] = {0};
+			char Buffer[0x4000] = {0}, Default[0x4000] = {0};
 			Serialize(Default, sizeof(Default));
 
 			GetPrivateProfileStringA(Section.c_str(), Key.c_str(), Default, Buffer, sizeof(Buffer), Manager->GetPath());
@@ -289,11 +288,6 @@ namespace SME
 			return Type;
 		}
 
-		inline const INISetting::Store& INISetting::GetData( void ) const
-		{
-			return Data;
-		}
-
 		inline void INISetting::SetInt( SInt32 Value )
 		{
 			SME_ASSERT(Type == kType_Integer);
@@ -354,6 +348,11 @@ namespace SME
 			}
 
 			return false;
+		}
+
+		inline const INISetting::Store& INISetting::operator()( void ) const
+		{
+			return Data;
 		}
 
 		inline bool INIManager::SortComparator( INISetting* First, INISetting* Second )

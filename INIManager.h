@@ -60,6 +60,7 @@ namespace SME
 			bool						operator<(const INISetting& Second);
 			const Store&				operator()(void) const;
 
+			const Store&				GetData(void) const;
 			const char*					GetKey(void) const;
 			const char*					GetSection(void) const;
 			const char*					GetDescription(void) const;
@@ -351,6 +352,11 @@ namespace SME
 		}
 
 		inline const INISetting::Store& INISetting::operator()( void ) const
+		{
+			return Data;
+		}
+
+		inline const INISetting::Store& INISetting::GetData( void ) const
 		{
 			return Data;
 		}

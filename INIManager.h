@@ -581,6 +581,9 @@ namespace SME
 				Current = SettingList->begin();
 				Setting = *Current;
 			}
+
+			if (Section != NULL && _stricmp(Setting->GetSection(), Section) != 0)
+				this->GetNextSetting();
 		}
 
 		inline const INISetting* INIManagerIterator::GetNextSetting()

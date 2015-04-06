@@ -5,6 +5,7 @@
 
 #include "SME_Prefix.h"
 #include <mbstring.h>
+#include <d3d9.h>
 
 namespace SME
 {
@@ -145,12 +146,11 @@ namespace SME
 			return false;
 		}
 
-		inline COLORREF GetRGB( const char* String )
+		inline void GetRGB(const char* String, int& R, int& G, int& B)
 		{
 			SME_ASSERT(String);
 
 			SME::StringHelpers::Tokenizer ColorParser(String, ", ");
-			int R = 0, G = 0, B = 0;
 
 			for (int i = 0; i < 3; i++)
 			{
@@ -171,8 +171,20 @@ namespace SME
 					}
 				}
 			}
+		}
 
+		inline COLORREF GetRGB(const char* String)
+		{
+			int R = 0, B = 0, G = 0;
+			GetRGB(String, R, G, B);
 			return RGB(R, G, B);
+		}
+
+		inline D3DCOLOR GetRGBD3D(const char* String, int Alpha)
+		{
+			int R = 0, B = 0, G = 0;
+			GetRGB(String, R, G, B);
+			return D3DCOLOR_ARGB(Alpha, R, G, B);
 		}
 
 		inline void Replace( std::string& Str, char Query, char Replacement )

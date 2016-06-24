@@ -19,7 +19,7 @@ namespace SME
 			ElapsedTimeCounter()
 			{
 				LARGE_INTEGER FrameBuffer;
-				
+
 				QueryPerformanceFrequency(&FrameBuffer);
 				Frequency = double(FrameBuffer.QuadPart) / 1000.0;
 				QueryPerformanceCounter(&FrameBuffer);
@@ -188,9 +188,7 @@ namespace SME
 					}
 
 					if (otherPtr)
-					{
 						otherPtrName = GetObjectClassName((void*)otherPtr);
-					}
 				}
 
 				OutDump += ("\n\t%3d +%03X ptr: 0x%08X: %32s *ptr: 0x%08x | %f: %32s", ix, ix*4, curPtr, curPtrName, otherPtr, otherFloat, otherPtrName);
@@ -198,6 +196,87 @@ namespace SME
 
 			return OutDump.c_str();
 		}
+
+		class IEventSource;
+
+		struct IEventData
+		{
+			const IEventSource*			Source;
+
+			IEventData(const IEventSource* Source) : Source(Source) {}
+			virtual ~IEventData()
+			{
+				;//
+			}
+		};
+
+		class IEventSink
+		{
+		public:
+			virtual ~IEventSink()
+			{
+				;//
+			}
+
+			virtual void					Handle(IEventData* Data) = 0;
+		};
+
+		class IEventSource
+		{
+		protected:
+			typedef std::vector<IEventSink*>			SinkListT;
+
+			SinkListT						Sinks;
+
+			virtual void Dispatch(IEventData* Data) const
+			{
+				for (SinkListT::const_iterator Itr = Sinks.begin(); Itr != Sinks.end(); ++Itr)
+					(*Itr)->Handle(Data);
+			}
+		public:
+
+			IEventSource() : Sinks()
+			{
+				Sinks.reserve(10);
+			}
+
+			virtual ~IEventSource()
+			{
+				ClearSinks();
+			}
+
+			// caller retains ownership of pointer
+			virtual bool AddSink(IEventSink* Sink)
+			{
+				SME_ASSERT(Sink);
+				if (std::find(Sinks.begin(), Sinks.end(), Sink) == Sinks.end())
+				{
+					Sinks.push_back(Sink);
+					return true;
+				}
+				else
+					return false;
+			}
+
+			virtual bool RemoveSink(IEventSink* Sink)
+			{
+				SME_ASSERT(Sink);
+
+				SinkListT::iterator Match = std::find(Sinks.begin(), Sinks.end(), Sink);
+				if (Match == Sinks.end())
+					return false;
+				else
+				{
+					Sinks.erase(Match);
+					return false;
+				}
+			}
+
+			virtual void ClearSinks()
+			{
+				Sinks.clear();
+			}
+		};
 	}
 }
 #endif

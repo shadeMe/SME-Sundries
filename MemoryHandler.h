@@ -193,17 +193,17 @@ namespace SME
 		typedef Handler_Ace MemHdlr;
 
 		// Helper macros
-		#define _DeclareMemHdlr(Name, Comment)									extern MemHdlr		kMemHdlr##Name; void Name##Hook(void)
-		#define _DeclareNopHdlr(Name, Comment)									extern NopHdlr		kMemHdlr##Name
+		#define _DeclareMemHdlr(Name, Comment)												extern SME::MemoryHandler::MemHdlr		kMemHdlr##Name; void Name##Hook(void)
+		#define _DeclareNopHdlr(Name, Comment)												extern SME::MemoryHandler::NopHdlr		kMemHdlr##Name
 
-		#define _DefineCallHdlr(Name, PatchAddr, Function)											MemHdlr	kMemHdlr##Name		(##PatchAddr, (UInt32)&##Function, 0, 0)
-		#define _DefineHookHdlr(Name, PatchAddr)													MemHdlr	kMemHdlr##Name		(##PatchAddr, Name##Hook, 0, 0)
-		#define _DefineHookHdlrWithBuffer(Name, PatchAddr, BufferSize, ...)							MemHdlr	kMemHdlr##Name		(##PatchAddr, Name##Hook, MakeUInt8Array(##BufferSize,  ##__VA_ARGS__), BufferSize)
-		#define _DefinePatchHdlr(Name, PatchAddr)													MemHdlr	kMemHdlr##Name		(##PatchAddr, (UInt32)0, 0, 0)
-		#define _DefinePatchHdlrWithBuffer(Name, PatchAddr, BufferSize, ...)						MemHdlr	kMemHdlr##Name		(##PatchAddr, (UInt32)0, MakeUInt8Array(##BufferSize,  ##__VA_ARGS__), BufferSize)
-		#define _DefineJumpHdlr(Name, PatchAddr, JumpAddr)											MemHdlr	kMemHdlr##Name		(##PatchAddr, JumpAddr, 0, 0)
-		#define _DefineJumpHdlrWithBuffer(Name, PatchAddr, JumpAddr, BufferSize, ...)				MemHdlr	kMemHdlr##Name		(##PatchAddr, JumpAddr, MakeUInt8Array(##BufferSize,  ##__VA_ARGS__), BufferSize)
-		#define _DefineNopHdlr(Name, PatchAddr, Size)												NopHdlr	kMemHdlr##Name		(##PatchAddr, Size)
+		#define _DefineCallHdlr(Name, PatchAddr, Function)									SME::MemoryHandler::MemHdlr	kMemHdlr##Name		(##PatchAddr, (UInt32)&##Function, 0, 0)
+		#define _DefineHookHdlr(Name, PatchAddr)											SME::MemoryHandler::MemHdlr	kMemHdlr##Name		(##PatchAddr, Name##Hook, 0, 0)
+		#define _DefineHookHdlrWithBuffer(Name, PatchAddr, BufferSize, ...)					SME::MemoryHandler::MemHdlr	kMemHdlr##Name		(##PatchAddr, Name##Hook, SME::MemoryHandler::MakeUInt8Array(##BufferSize,  ##__VA_ARGS__), BufferSize)
+		#define _DefinePatchHdlr(Name, PatchAddr)											SME::MemoryHandler::MemHdlr	kMemHdlr##Name		(##PatchAddr, (UInt32)0, 0, 0)
+		#define _DefinePatchHdlrWithBuffer(Name, PatchAddr, BufferSize, ...)				SME::MemoryHandler::MemHdlr	kMemHdlr##Name		(##PatchAddr, (UInt32)0, SME::MemoryHandler::MakeUInt8Array(##BufferSize,  ##__VA_ARGS__), BufferSize)
+		#define _DefineJumpHdlr(Name, PatchAddr, JumpAddr)									SME::MemoryHandler::MemHdlr	kMemHdlr##Name		(##PatchAddr, JumpAddr, 0, 0)
+		#define _DefineJumpHdlrWithBuffer(Name, PatchAddr, JumpAddr, BufferSize, ...)		SME::MemoryHandler::MemHdlr	kMemHdlr##Name		(##PatchAddr, JumpAddr, SME::MemoryHandler::MakeUInt8Array(##BufferSize,  ##__VA_ARGS__), BufferSize)
+		#define _DefineNopHdlr(Name, PatchAddr, Size)										SME::MemoryHandler::NopHdlr	kMemHdlr##Name		(##PatchAddr, Size)
 
 		#define _MemHdlr(Name)													kMemHdlr##Name
 		#define _MemHdlrHook(Name)												Name##Hook
@@ -251,7 +251,7 @@ namespace SME
 
 		#define zz___HookHdlrFnVariable(Name, Variable)							k##Name##Hook##Variable##Addr
 		#define zz__HookHdlrFnVariable(Name, Variable)							zz___HookHdlrFnVariable(Name, Variable)
-		
+
 		// used to easily identify mem addrs
 		#define VOLATILE(MemoryAddress)											MemoryAddress
 

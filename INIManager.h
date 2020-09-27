@@ -18,7 +18,7 @@ namespace SME
 		class INISetting
 		{
 		public:
-			enum 
+			enum
 			{
 				kType_Integer	= 0,
 				kType_Unsigned,			// interpreted as hexadecimals
@@ -77,7 +77,7 @@ namespace SME
 			bool						ToggleData(void);
 		};
 
-		typedef std::list<INISetting*>							INISettingListT;
+		typedef std::vector<INISetting*>						INISettingListT;
 
 		class INIManager
 		{
@@ -379,12 +379,12 @@ namespace SME
 			if (Dynamic == false)
 			{
 				StaticSettings.push_back(Setting);
-				StaticSettings.sort(SortComparator);
+				std::sort(StaticSettings.begin(), StaticSettings.end(), SortComparator);
 			}
 			else
 			{
 				DynamicSettings.push_back(Setting);
-				DynamicSettings.sort(SortComparator);
+				std::sort(DynamicSettings.begin(), DynamicSettings.end(), SortComparator);
 			}
 
 			return true;

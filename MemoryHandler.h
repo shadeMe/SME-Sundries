@@ -193,6 +193,7 @@ namespace SME
 		typedef Handler_Ace MemHdlr;
 
 		// Helper macros
+		// TODO: Remove standard non-compliant leading underscores
 		#define _DeclareMemHdlr(Name, Comment)												extern SME::MemoryHandler::MemHdlr		kMemHdlr##Name; void Name##Hook(void)
 		#define _DeclareNopHdlr(Name, Comment)												extern SME::MemoryHandler::NopHdlr		kMemHdlr##Name
 

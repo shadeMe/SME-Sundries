@@ -76,6 +76,12 @@ namespace SME
 			return ResultArray;
 		}
 
+		inline void WriteNop(UInt32 addr, UInt32 len)
+		{
+			for (int i = 0; i < len; ++i)
+				SafeWrite8(addr + i, 0x90);
+		}
+
 		class Handler_Nop
 		{
 			UInt32				m_Address;
@@ -93,9 +99,7 @@ namespace SME
 				if (m_Address == 0)
 					return;
 
-				for (int i = 0; i < m_Size; i++) {
-					SafeWrite8(m_Address + i, 0x90);
-				}
+				MemoryHandler::WriteNop(m_Address, m_Size);
 			}
 		};
 

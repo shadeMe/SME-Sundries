@@ -156,16 +156,16 @@ namespace SME
 			switch (Type)
 			{
 			case kType_Integer:
-				_snprintf_s(Dest, Size, "%d", Data.i);
+				_snprintf_s(Dest, Size, _TRUNCATE, "%d", Data.i);
 				break;
 			case kType_Unsigned:
-				_snprintf_s(Dest, Size, "%08X", Data.u);
+				_snprintf_s(Dest, Size, _TRUNCATE, "%08X", Data.u);
 				break;
 			case kType_Float:
-				_snprintf_s(Dest, Size, "%f", Data.f);
+				_snprintf_s(Dest, Size, _TRUNCATE, "%f", Data.f);
 				break;
 			case kType_String:
-				_snprintf_s(Dest, Size, "%s", Data.s);
+				_snprintf_s(Dest, Size, _TRUNCATE, "%s", Data.s);
 				break;
 			}
 		}
@@ -318,7 +318,7 @@ namespace SME
 
 			va_list Args;
 			va_start(Args, Format);
-			v_snprintf_s(Buffer, sizeof(Buffer), Format, Args);
+			vsnprintf_s(Buffer, sizeof(Buffer), _TRUNCATE, Format, Args);
 			va_end(Args);
 
 			SetCString(&Data.s, Buffer);

@@ -27,7 +27,7 @@ typedef signed long long	SInt64;		//!< A signed 64-bit integer value
 typedef float				Float32;	//!< A 32-bit floating point value
 typedef double				Float64;	//!< A 64-bit floating point value
 
-#define FORMAT_STR(Buffer, ...)		sprintf_s(Buffer, sizeof(Buffer), ##__VA_ARGS__)
+#define FORMAT_STR(Buffer, ...)		_snprintf_s(Buffer, sizeof(Buffer), _TRUNCATE, ##__VA_ARGS__)
 
 #undef SME_ASSERT
 extern "C"

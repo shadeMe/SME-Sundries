@@ -126,7 +126,7 @@ namespace SME
 
 			va_list Args;
 			va_start(Args, Format);
-			vsprintf_s(Buffer, sizeof(Buffer), Format, Args);
+			vsnprintf_s(Buffer, sizeof(Buffer), _TRUNCATE, Format, Args);
 			va_end(Args);
 
 			WCHAR WideBuffer[0x1000] = {0};

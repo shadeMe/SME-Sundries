@@ -63,19 +63,19 @@ namespace SME
 				switch (i)
 				{
 				case 0:
-					sprintf_s(Buffer, sizeof(Buffer), "Section");
+					_snprintf_s(Buffer, sizeof(Buffer), _TRUNCATE, "Section");
 					lvc.cx = 200;
 					break;
 				case 1:
-					sprintf_s(Buffer, sizeof(Buffer), "Setting");
+					_snprintf_s(Buffer, sizeof(Buffer), _TRUNCATE, "Setting");
 					lvc.cx = 200;
 					break;
 				case 2:
-					sprintf_s(Buffer, sizeof(Buffer), "Value");
+					_snprintf_s(Buffer, sizeof(Buffer), _TRUNCATE, "Value");
 					lvc.cx = 120;
 					break;
 				case 3:
-					sprintf_s(Buffer, sizeof(Buffer), "Description");
+					_snprintf_s(Buffer, sizeof(Buffer), _TRUNCATE, "Description");
 					lvc.cx = 400;
 					break;
 				}
